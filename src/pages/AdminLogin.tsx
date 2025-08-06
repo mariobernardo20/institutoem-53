@@ -28,8 +28,7 @@ const AdminLogin = () => {
     fullName: "",
     email: "",
     password: "",
-    confirmPassword: "",
-    adminCode: ""
+    confirmPassword: ""
   });
 
   useEffect(() => {
@@ -137,19 +136,12 @@ const AdminLogin = () => {
       return;
     }
 
-    // Códigos administrativos válidos
-    const validCodes = ["ADMIN2024", "MASTER_KEY_2024", "SUPER_ADMIN"];
-    if (!validCodes.includes(registerData.adminCode)) {
-      setError("Código administrativo inválido");
-      setLoading(false);
-      return;
-    }
-
     try {
       const { error, data } = await supabase.auth.signUp({
         email: registerData.email,
         password: registerData.password,
         options: {
+          emailRedirectTo: `${window.location.origin}/admin-login`,
           data: {
             full_name: registerData.fullName,
             role: 'admin'
@@ -201,8 +193,7 @@ const AdminLogin = () => {
               fullName: "",
               email: "",
               password: "",
-              confirmPassword: "",
-              adminCode: ""
+              confirmPassword: ""
             });
           }
         } catch (err) {
@@ -344,19 +335,6 @@ const AdminLogin = () => {
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="register-adminCode">Código Administrativo</Label>
-                  <Input
-                    id="register-adminCode"
-                    name="adminCode"
-                    type="password"
-                    value={registerData.adminCode}
-                    onChange={handleRegisterChange}
-                    required
-                    disabled={loading}
-                    placeholder="Código especial para admin"
-                  />
-                </div>
 
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? "Criando conta..." : "Criar Conta Admin"}

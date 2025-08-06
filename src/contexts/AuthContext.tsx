@@ -154,20 +154,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     if (user?.id) {
-      // Verificar se o usuário está na tabela admin_users
-      supabase
-        .from('admin_users')
-        .select('status, role')
-        .eq('user_id', user.id)
-        .eq('status', 'active')
-        .single()
-        .then(({ data, error }) => {
+      // Verificar se o usuário está na tabela admin_users com timeout
+      const checkAdminStatus = async () => {
+        try {
+          const { data, error } = await supabase
+            .from('admin_users')
+            .select('status, role')
+            .eq('user_id', user.id)
+            .eq('status', 'active')
+            .maybeSingle();
+
           if (!error && data) {
             setAdminStatus(true);
           } else {
             setAdminStatus(false);
           }
-        });
+        } catch (err) {
+          console.error('Erro ao verificar status admin:', err);
+          setAdminStatus(false);
+        }
+      };
+
+      // Add a timeout to prevent infinite loading
+      const timeoutId = setTimeout(() => {
+        setAdminStatus(false);
+      }, 5000);
+
+      checkAdminStatus().finally(() => {
+        clearTimeout(timeoutId);
+      });
+
+      return () => clearTimeout(timeoutId);
     } else {
       setAdminStatus(false);
     }
