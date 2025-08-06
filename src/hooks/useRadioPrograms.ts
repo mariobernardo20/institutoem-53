@@ -19,8 +19,8 @@ export const useRadioPrograms = () => {
       const { data, error } = await supabase
         .from('radio_programs')
         .select('*')
-        .order('day_of_week', { ascending: true })
-        .order('start_time', { ascending: true });
+        .eq('is_active', true)
+        .order('schedule_time', { ascending: true });
 
       if (error) throw error;
 

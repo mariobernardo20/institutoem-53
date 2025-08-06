@@ -8,8 +8,8 @@ import { useToast } from "@/components/ui/use-toast";
 import { PortugalNews } from "@/components/PortugalNews";
 import { WeatherWidget } from "@/components/WeatherWidget";
 import { RadioTeam } from "@/components/RadioTeam";
-import RadioComments from "@/components/RadioComments";
-import RadioPolls from "@/components/RadioPolls";
+import OptimizedRadioComments from "@/components/OptimizedRadioComments";
+import OptimizedRadioPolls from "@/components/OptimizedRadioPolls";
 import { useRadioPrograms } from "@/hooks/useRadioPrograms";
 import { useLanguage } from "@/contexts/LanguageContext";
 import Header from "@/components/Header";
@@ -283,8 +283,8 @@ const Radio = () => {
 
             {/* Interactive Section - Polls and Comments */}
             <div className="space-y-8">
-              <RadioPolls programId={currentProgram?.id} />
-              <RadioComments programId={currentProgram?.id} />
+              <OptimizedRadioPolls programId={currentProgram?.id} />
+              <OptimizedRadioComments programId={currentProgram?.id} />
             </div>
           </div>
 

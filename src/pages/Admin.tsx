@@ -173,8 +173,9 @@ const Admin = () => {
             </div>
             <div className="flex items-center gap-4">
               <div className="text-right">
-                <p className="text-sm text-muted-foreground">Logado como:</p>
-                <p className="font-medium">{user.email}</p>
+                <p className="text-sm text-muted-foreground">Bem-vindo:</p>
+                <p className="font-medium">{user?.user_metadata?.full_name || user.email}</p>
+                <p className="text-xs text-muted-foreground">Admin</p>
               </div>
               <Button 
                 variant="outline" 
