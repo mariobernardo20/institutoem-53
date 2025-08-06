@@ -100,11 +100,14 @@ const Auth = () => {
     try {
       const redirectUrl = `${window.location.origin}/`;
       
-      const { error } = await supabase.auth.signUp({
+      const { error, data } = await supabase.auth.signUp({
         email: signupEmail,
         password: signupPassword,
         options: {
-          emailRedirectTo: redirectUrl
+          emailRedirectTo: redirectUrl,
+          data: {
+            email_confirm: false // Para testes, permite login sem confirmação
+          }
         }
       });
 
@@ -114,8 +117,27 @@ const Auth = () => {
         } else {
           setError(error.message);
         }
-      } else {
-        setMessage("Verifique seu email para confirmar a conta");
+      } else if (data.user) {
+        // Criar perfil automaticamente
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert({
+            user_id: data.user.id,
+            email: signupEmail,
+            role: 'user'
+          });
+
+        if (profileError) {
+          console.warn('Erro ao criar perfil:', profileError);
+        }
+
+        if (data.session) {
+          // Se o usuário foi automaticamente logado
+          setMessage("Conta criada com sucesso! Redirecionando...");
+          setTimeout(() => navigate("/"), 1500);
+        } else {
+          setMessage("Verifique seu email para confirmar a conta");
+        }
       }
     } catch (err) {
       setError("Erro inesperado. Tente novamente.");
@@ -135,6 +157,15 @@ const Auth = () => {
           <CardDescription>
             Entre ou crie sua conta para continuar
           </CardDescription>
+          <div className="flex justify-center mt-4">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => navigate("/")}
+            >
+              ← Voltar para página principal
+            </Button>
+          </div>
         </CardHeader>
         
         <CardContent>

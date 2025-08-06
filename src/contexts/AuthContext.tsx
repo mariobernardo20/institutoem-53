@@ -149,7 +149,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const isAdmin = profile?.role === 'admin' || profile?.role === 'super_admin';
+  // Verificar admin através da tabela admin_users também
+  const [adminStatus, setAdminStatus] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (user?.id) {
+      // Verificar se o usuário está na tabela admin_users
+      supabase
+        .from('admin_users')
+        .select('status, role')
+        .eq('user_id', user.id)
+        .eq('status', 'active')
+        .single()
+        .then(({ data, error }) => {
+          if (!error && data) {
+            setAdminStatus(true);
+          } else {
+            setAdminStatus(false);
+          }
+        });
+    } else {
+      setAdminStatus(false);
+    }
+  }, [user?.id]);
+
+  const isAdmin = adminStatus || profile?.role === 'admin' || profile?.role === 'super_admin';
 
   const value: AuthContextType = {
     user,

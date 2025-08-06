@@ -164,28 +164,50 @@ const AdminLogin = () => {
           setError(error.message);
         }
       } else if (data.user) {
-        // Create profile with admin role
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert({
-            id: data.user.id,
-            user_id: data.user.id,
-            email: registerData.email,
-            full_name: registerData.fullName,
-            role: 'admin'
-          });
+        try {
+          // Inserir nos dois locais para consistência
+          
+          // 1. Criar perfil na tabela profiles
+          const { error: profileError } = await supabase
+            .from('profiles')
+            .insert({
+              user_id: data.user.id,
+              email: registerData.email,
+              full_name: registerData.fullName,
+              role: 'admin'
+            });
 
-        if (profileError) {
-          setError("Erro ao criar perfil administrativo");
-        } else {
-          setSuccess("Conta administrativa criada com sucesso! Verifique seu email para confirmar.");
-          setRegisterData({
-            fullName: "",
-            email: "",
-            password: "",
-            confirmPassword: "",
-            adminCode: ""
-          });
+          if (profileError) {
+            console.warn('Erro ao criar perfil:', profileError);
+          }
+
+          // 2. Criar entrada na tabela admin_users (mais importante)
+          const { error: adminError } = await supabase
+            .from('admin_users')
+            .insert({
+              user_id: data.user.id,
+              email: registerData.email,
+              full_name: registerData.fullName,
+              role: 'admin',
+              status: 'active'
+            });
+
+          if (adminError) {
+            console.error('Erro crítico ao criar admin_user:', adminError);
+            setError(`Erro ao criar usuário administrativo: ${adminError.message}`);
+          } else {
+            setSuccess("Conta administrativa criada com sucesso! Você já pode fazer login.");
+            setRegisterData({
+              fullName: "",
+              email: "",
+              password: "",
+              confirmPassword: "",
+              adminCode: ""
+            });
+          }
+        } catch (err) {
+          console.error('Erro ao criar registros admin:', err);
+          setError("Erro ao configurar permissões administrativas");
         }
       }
     } catch (err) {
