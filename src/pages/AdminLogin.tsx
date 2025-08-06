@@ -76,6 +76,8 @@ const AdminLogin = () => {
           setError(error.message);
         }
       } else if (data.user) {
+        console.log('Login bem-sucedido para usuário:', data.user.id);
+        
         // Check if user is admin by fetching admin_users table
         const { data: adminUser, error: adminError } = await supabase
           .from('admin_users')
@@ -84,10 +86,14 @@ const AdminLogin = () => {
           .eq('status', 'active')
           .single();
 
+        console.log('Verificação admin:', { adminUser, adminError });
+
         if (adminError || !adminUser) {
+          console.log('Usuário não é admin ou erro:', adminError);
           await supabase.auth.signOut();
           setError("Acesso negado. Este login é apenas para administradores.");
         } else {
+          console.log('Admin verificado, redirecionando...');
           // Successful admin login - redirect to admin panel
           setSuccess("Login realizado com sucesso! Redirecionando...");
           setTimeout(() => {
