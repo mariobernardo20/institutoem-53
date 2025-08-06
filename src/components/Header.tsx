@@ -11,10 +11,14 @@ const Header = () => {
     setLanguage,
     t
   } = useLanguage();
-  const { user, profile, signOut, isAdmin } = useAuth();
+  const {
+    user,
+    profile,
+    signOut,
+    isAdmin
+  } = useAuth();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
   const handleSignOut = async () => {
     await signOut();
     navigate("/");
@@ -73,8 +77,7 @@ const Header = () => {
             
             {/* Auth section */}
             <div className="hidden md:flex items-center gap-2">
-              {user ? (
-                <DropdownMenu>
+              {user ? <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" size="sm" className="gap-2">
                       <User className="h-4 w-4" />
@@ -82,33 +85,24 @@ const Header = () => {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    {isAdmin && (
-                      <DropdownMenuItem asChild>
+                    {isAdmin && <DropdownMenuItem asChild>
                         <Link to="/admin">
                           Administração
                         </Link>
-                      </DropdownMenuItem>
-                    )}
+                      </DropdownMenuItem>}
                     <DropdownMenuItem onClick={handleSignOut}>
                       <LogOut className="h-4 w-4 mr-2" />
                       Sair
                     </DropdownMenuItem>
                   </DropdownMenuContent>
-                </DropdownMenu>
-              ) : (
-                <>
+                </DropdownMenu> : <>
                   <Link to="/auth">
-                    <Button variant="outline" size="sm">
-                      Entrar
-                    </Button>
+                    
                   </Link>
                   <Link to="/auth">
-                    <Button size="sm">
-                      Registrar
-                    </Button>
+                    
                   </Link>
-                </>
-              )}
+                </>}
             </div>
             
             <Button variant="ghost" size="sm" className="md:hidden" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
