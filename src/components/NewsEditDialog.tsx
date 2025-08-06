@@ -79,7 +79,9 @@ export const NewsEditDialog = ({ open, onOpenChange, newsItem, onSaved }: NewsEd
           content: content.trim(),
           category,
           image_url: imageUrl || "/lovable-uploads/fb46a527-5bbf-4865-a44c-b3109d663fa6.png",
-          published_at: new Date().toISOString()
+          published_at: new Date().toISOString(),
+          status: "published",
+          author_id: null
         });
 
         if (success) {

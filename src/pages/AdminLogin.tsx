@@ -76,16 +76,15 @@ const AdminLogin = () => {
           setError(error.message);
         }
       } else if (data.user) {
-        // Check if user is admin by fetching profile
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('role')
+        // Check if user is admin by fetching admin_users table
+        const { data: adminUser, error: adminError } = await supabase
+          .from('admin_users')
+          .select('role, status')
           .eq('user_id', data.user.id)
+          .eq('status', 'active')
           .single();
 
-        if (profileError) {
-          setError("Erro ao verificar permissões");
-        } else if (profile?.role !== 'admin' && profile?.role !== 'super_admin') {
+        if (adminError || !adminUser) {
           await supabase.auth.signOut();
           setError("Acesso negado. Este login é apenas para administradores.");
         } else {
