@@ -22,6 +22,7 @@ import Pricing from "./pages/Pricing";
 import PackageComparison from "./pages/PackageComparison";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
+import AdminLogin from "./pages/AdminLogin";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -52,6 +53,7 @@ const App = () => (
               <Route path="/comparacao-pacotes" element={<PackageComparison />} />
               <Route path="/registro" element={<Register />} />
               <Route path="/login" element={<Login />} />
+              <Route path="/admin-login" element={<AdminLogin />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
