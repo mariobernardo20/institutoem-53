@@ -9,6 +9,7 @@ import SearchFilters from "@/components/SearchFilters";
 import SearchResults from "@/components/SearchResults";
 import RadioPlayer from "@/components/RadioPlayer";
 import Footer from "@/components/Footer";
+import { PortugalNews } from "@/components/PortugalNews";
 const Index = () => {
   const [activeFilter, setActiveFilter] = useState("Imigração");
   const navigate = useNavigate();
@@ -22,8 +23,19 @@ const Index = () => {
       
       <CategoryMenu activeFilter={activeFilter} onFilterChange={setActiveFilter} />
       <SearchHero />
-      <SearchFilters activeFilter={activeFilter} onFilterChange={setActiveFilter} />
-      <SearchResults activeFilter={activeFilter} />
+      
+      {/* Portugal News Section */}
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2">
+            <SearchFilters activeFilter={activeFilter} onFilterChange={setActiveFilter} />
+            <SearchResults activeFilter={activeFilter} />
+          </div>
+          <div className="lg:col-span-1">
+            <PortugalNews />
+          </div>
+        </div>
+      </div>
       <Footer />
     </div>;
 };
