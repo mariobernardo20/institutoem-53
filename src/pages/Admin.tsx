@@ -1,11 +1,13 @@
-import { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { Navigate, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, Radio, Newspaper, FileText, BarChart3, Settings, LogOut, Briefcase, GraduationCap, Mail, Shield } from "lucide-react";
+import { Users, Radio, Newspaper, FileText, BarChart3, LogOut, Shield, Loader } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 import { NewsAdmin } from "@/components/NewsAdmin";
 import { AdminManagement } from "@/components/AdminManagement";
 import { RadioTeamManagement } from "@/components/RadioTeamManagement";
@@ -19,17 +21,6 @@ import RadioPollsManagement from "@/components/RadioPollsManagement";
 import RadioCommentsManagement from "@/components/RadioCommentsManagement";
 import AdminUsersManagement from "@/components/AdminUsersManagement";
 
-interface ServiceRequest {
-  id: string;
-  service_name: string;
-  client_name: string;
-  client_email: string;
-  client_phone: string;
-  description: string;
-  status: string;
-  requested_at: string;
-}
-
 interface StatsData {
   candidatesCount: number;
   newsCount: number;
@@ -39,7 +30,11 @@ interface StatsData {
 }
 
 const Admin = () => {
-  const [serviceRequests, setServiceRequests] = useState<ServiceRequest[]>([]);
+  const { user, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const [stats, setStats] = useState<StatsData>({
     candidatesCount: 0,
     newsCount: 0,
@@ -48,91 +43,119 @@ const Admin = () => {
     radioProgramsCount: 0
   });
   const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
 
+  // Check if user is admin
   useEffect(() => {
-    fetchData();
-  }, []);
+    const checkAdminStatus = async () => {
+      if (!user) {
+        setIsAdmin(false);
+        setLoading(false);
+        return;
+      }
+
+      try {
+        console.log('Verificando status de admin para usuário:', user.id);
+        
+        // Check if user exists in admin_users table with active status
+        const { data: adminUser, error } = await supabase
+          .from('admin_users')
+          .select('role, status')
+          .eq('user_id', user.id)
+          .eq('status', 'active')
+          .single();
+
+        console.log('Resultado da verificação admin:', { adminUser, error });
+
+        if (error || !adminUser) {
+          console.log('Usuário não é admin');
+          setIsAdmin(false);
+        } else {
+          console.log('Usuário é admin:', adminUser.role);
+          setIsAdmin(true);
+        }
+      } catch (error) {
+        console.error('Erro ao verificar status de admin:', error);
+        setIsAdmin(false);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (!authLoading) {
+      checkAdminStatus();
+    }
+  }, [user, authLoading]);
+
+  // Fetch admin data
+  useEffect(() => {
+    if (isAdmin === true) {
+      fetchData();
+    }
+  }, [isAdmin]);
 
   const fetchData = async () => {
     try {
-      // Mock service requests since table doesn't exist
-      const requests: ServiceRequest[] = [];
-
-      // Fetch stats
+      console.log('Carregando dados do painel admin...');
+      
+      // Fetch stats from real database
       const [candidatesResult, newsResult, radioProgramsResult] = await Promise.all([
         supabase.from('candidates').select('id', { count: 'exact' }),
         supabase.from('news').select('id', { count: 'exact' }),
         supabase.from('radio_programs').select('id', { count: 'exact' })
       ]);
 
-      const pendingRequests = 0;
-
-      setServiceRequests([]);
       setStats({
         candidatesCount: candidatesResult.count || 0,
         newsCount: newsResult.count || 0,
         serviceRequestsCount: 0,
-        pendingRequestsCount: pendingRequests,
+        pendingRequestsCount: 0,
         radioProgramsCount: radioProgramsResult.count || 0
       });
+
+      console.log('Dados carregados:', {
+        candidates: candidatesResult.count,
+        news: newsResult.count,
+        radioPrograms: radioProgramsResult.count
+      });
     } catch (error) {
-      console.error('Error fetching admin data:', error);
+      console.error('Erro ao carregar dados do painel:', error);
       toast({
         title: "Erro",
         description: "Erro ao carregar dados do painel",
         variant: "destructive"
       });
-    } finally {
-      setLoading(false);
     }
   };
 
-  const updateRequestStatus = async (requestId: string, newStatus: string) => {
+  const handleLogout = async () => {
     try {
-      // Mock function since table doesn't exist
-
-      // No error handling needed for mock
-
-      setServiceRequests(prev =>
-        prev.map(req =>
-          req.id === requestId ? { ...req, status: newStatus } : req
-        )
-      );
-
-      toast({
-        title: "Sucesso",
-        description: "Status da solicitação atualizado",
-      });
+      await supabase.auth.signOut();
+      navigate("/admin-login");
     } catch (error) {
+      console.error('Erro ao fazer logout:', error);
       toast({
         title: "Erro",
-        description: "Erro ao atualizar status",
+        description: "Erro ao fazer logout",
         variant: "destructive"
       });
     }
   };
 
-  const getStatusBadge = (status: string) => {
-    const statusConfig = {
-      pending: { label: "Pendente", variant: "default" as const },
-      in_progress: { label: "Em Andamento", variant: "secondary" as const },
-      completed: { label: "Concluído", variant: "default" as const },
-      rejected: { label: "Rejeitado", variant: "destructive" as const }
-    };
-
-    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.pending;
-    return <Badge variant={config.variant}>{config.label}</Badge>;
-  };
-
-  if (loading) {
+  // Show loading state
+  if (authLoading || loading) {
     return (
-      <div className="min-h-screen bg-background p-6">
-        <div className="container mx-auto">
-          <div className="text-center">Carregando painel...</div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <Loader className="h-8 w-8 animate-spin" />
+          <p className="text-muted-foreground">Carregando painel administrativo...</p>
         </div>
       </div>
     );
+  }
+
+  // Redirect if not authenticated or not admin
+  if (!user || isAdmin === false) {
+    return <Navigate to="/admin-login" replace />;
   }
 
   return (
@@ -141,21 +164,27 @@ const Admin = () => {
       <div className="bg-card border-b">
         <div className="container mx-auto px-4 py-6">
           <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold text-foreground mb-2">Painel Administrativo</h1>
-              <p className="text-muted-foreground">Gestão do Instituto Empreendedor</p>
+            <div className="flex items-center gap-3">
+              <Shield className="h-8 w-8 text-primary" />
+              <div>
+                <h1 className="text-3xl font-bold text-foreground mb-1">Painel Administrativo</h1>
+                <p className="text-muted-foreground">Instituto Empreendedor - Gestão Completa</p>
+              </div>
             </div>
-            <Button 
-              variant="outline" 
-              onClick={() => {
-                supabase.auth.signOut();
-                window.location.href = '/';
-              }}
-              className="flex items-center gap-2"
-            >
-              <LogOut className="h-4 w-4" />
-              Sair
-            </Button>
+            <div className="flex items-center gap-4">
+              <div className="text-right">
+                <p className="text-sm text-muted-foreground">Logado como:</p>
+                <p className="font-medium">{user.email}</p>
+              </div>
+              <Button 
+                variant="outline" 
+                onClick={handleLogout}
+                className="flex items-center gap-2"
+              >
+                <LogOut className="h-4 w-4" />
+                Sair
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -235,9 +264,12 @@ const Admin = () => {
         </div>
 
         {/* Main Content */}
-        <Tabs defaultValue="requests" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-12">
-            <TabsTrigger value="requests">Solicitações</TabsTrigger>
+        <Tabs defaultValue="admin-users" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-11">
+            <TabsTrigger value="admin-users">
+              <Shield className="h-4 w-4 mr-1" />
+              Admins
+            </TabsTrigger>
             <TabsTrigger value="candidates">Candidatos</TabsTrigger>
             <TabsTrigger value="jobs">Vagas</TabsTrigger>
             <TabsTrigger value="scholarships">Bolsas</TabsTrigger>
@@ -247,75 +279,12 @@ const Admin = () => {
             <TabsTrigger value="radio-programs">Programação</TabsTrigger>
             <TabsTrigger value="radio-polls">Enquetes</TabsTrigger>
             <TabsTrigger value="radio-comments">Comentários</TabsTrigger>
-            <TabsTrigger value="admin-users">
-              <Shield className="h-4 w-4 mr-1" />
-              Usuários Admin
-            </TabsTrigger>
             <TabsTrigger value="settings">Configurações</TabsTrigger>
           </TabsList>
 
-          {/* Service Requests */}
-          <TabsContent value="requests">
-            <Card>
-              <CardHeader>
-                <CardTitle>Solicitações de Serviços</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {serviceRequests.map((request) => (
-                    <div key={request.id} className="border rounded-lg p-4">
-                      <div className="flex items-start justify-between mb-3">
-                        <div>
-                          <h3 className="font-semibold">{request.service_name}</h3>
-                          <p className="text-sm text-muted-foreground">
-                            {request.client_name} • {request.client_email}
-                          </p>
-                          {request.client_phone && (
-                            <p className="text-sm text-muted-foreground">{request.client_phone}</p>
-                          )}
-                        </div>
-                        {getStatusBadge(request.status)}
-                      </div>
-                      
-                      <p className="text-sm mb-4">{request.description}</p>
-                      
-                      <div className="flex items-center gap-2">
-                        <Button 
-                          size="sm" 
-                          variant="outline"
-                          onClick={() => updateRequestStatus(request.id, 'in_progress')}
-                          disabled={request.status !== 'pending'}
-                        >
-                          Aceitar
-                        </Button>
-                        <Button 
-                          size="sm" 
-                          variant="outline"
-                          onClick={() => updateRequestStatus(request.id, 'completed')}
-                          disabled={request.status === 'completed' || request.status === 'rejected'}
-                        >
-                          Concluir
-                        </Button>
-                        <Button 
-                          size="sm" 
-                          variant="destructive"
-                          onClick={() => updateRequestStatus(request.id, 'rejected')}
-                          disabled={request.status === 'completed' || request.status === 'rejected'}
-                        >
-                          Rejeitar
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                  
-                  {serviceRequests.length === 0 && (
-                    <div className="text-center py-8">
-                      <p className="text-muted-foreground">Nenhuma solicitação encontrada</p>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
+          {/* Admin Users Management - Default Tab */}
+          <TabsContent value="admin-users">
+            <AdminUsersManagement />
           </TabsContent>
 
           {/* Candidates Management */}
@@ -363,10 +332,6 @@ const Admin = () => {
 
           <TabsContent value="radio-comments">
             <RadioCommentsManagement />
-          </TabsContent>
-
-          <TabsContent value="admin-users">
-            <AdminUsersManagement />
           </TabsContent>
 
           <TabsContent value="settings">

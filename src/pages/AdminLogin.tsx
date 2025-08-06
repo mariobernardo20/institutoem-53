@@ -72,8 +72,6 @@ const AdminLogin = () => {
       if (error) {
         if (error.message.includes("Invalid login credentials")) {
           setError("Email ou senha incorretos");
-        } else {
-          setError(error.message);
         }
       } else if (data.user) {
         console.log('Login bem-sucedido para usuário:', data.user.id);
@@ -94,11 +92,23 @@ const AdminLogin = () => {
           setError("Acesso negado. Este login é apenas para administradores.");
         } else {
           console.log('Admin verificado, redirecionando...');
-          // Successful admin login - redirect to admin panel
+          
+          // Log the successful admin login
+          try {
+            await supabase.rpc('log_admin_action', {
+              p_action: 'admin_login_success',
+              p_target_type: 'auth',
+              p_target_id: data.user.id,
+              p_details: { email: data.user.email, role: adminUser.role }
+            });
+          } catch (logError) {
+            console.warn('Erro ao registrar log de login:', logError);
+          }
+
+          // Successful admin login - redirect immediately
           setSuccess("Login realizado com sucesso! Redirecionando...");
-          setTimeout(() => {
-            navigate("/admin");
-          }, 1000);
+          // Immediate redirect without delay
+          navigate("/admin");
         }
       }
     } catch (err) {

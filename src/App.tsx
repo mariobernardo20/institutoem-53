@@ -23,6 +23,7 @@ import PackageComparison from "./pages/PackageComparison";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
 import AdminLogin from "./pages/AdminLogin";
+import AdminAcceptInvite from "./pages/AdminAcceptInvite";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -54,6 +55,7 @@ const App = () => (
               <Route path="/registro" element={<Register />} />
               <Route path="/login" element={<Login />} />
               <Route path="/admin-login" element={<AdminLogin />} />
+              <Route path="/admin-accept-invite" element={<AdminAcceptInvite />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
