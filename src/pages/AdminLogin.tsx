@@ -118,7 +118,9 @@ const AdminLogin = () => {
       return;
     }
 
-    if (registerData.adminCode !== "ADMIN2024") {
+    // Códigos administrativos válidos
+    const validCodes = ["ADMIN2024", "MASTER_KEY_2024", "SUPER_ADMIN"];
+    if (!validCodes.includes(registerData.adminCode)) {
       setError("Código administrativo inválido");
       setLoading(false);
       return;
