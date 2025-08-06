@@ -14,6 +14,126 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_users: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          email: string
+          full_name: string
+          id: string
+          role: string | null
+          status: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          email: string
+          full_name: string
+          id?: string
+          role?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          email?: string
+          full_name?: string
+          id?: string
+          role?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      candidates: {
+        Row: {
+          created_at: string
+          email: string
+          experience_years: number | null
+          full_name: string
+          id: string
+          phone: string | null
+          photo_url: string | null
+          position: string | null
+          resume_url: string | null
+          skills: string[] | null
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          experience_years?: number | null
+          full_name: string
+          id?: string
+          phone?: string | null
+          photo_url?: string | null
+          position?: string | null
+          resume_url?: string | null
+          skills?: string[] | null
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          experience_years?: number | null
+          full_name?: string
+          id?: string
+          phone?: string | null
+          photo_url?: string | null
+          position?: string | null
+          resume_url?: string | null
+          skills?: string[] | null
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      news: {
+        Row: {
+          author_id: string | null
+          category: string | null
+          content: string
+          created_at: string
+          id: string
+          image_url: string | null
+          published_at: string | null
+          status: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author_id?: string | null
+          category?: string | null
+          content: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          published_at?: string | null
+          status?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string | null
+          category?: string | null
+          content?: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          published_at?: string | null
+          status?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -41,6 +161,78 @@ export type Database = {
           role?: string | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      radio_comments: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          is_approved: boolean | null
+          updated_at: string
+          user_email: string | null
+          user_id: string | null
+          user_name: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          is_approved?: boolean | null
+          updated_at?: string
+          user_email?: string | null
+          user_id?: string | null
+          user_name: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          is_approved?: boolean | null
+          updated_at?: string
+          user_email?: string | null
+          user_id?: string | null
+          user_name?: string
+        }
+        Relationships: []
+      }
+      radio_programs: {
+        Row: {
+          created_at: string
+          description: string | null
+          duration_minutes: number | null
+          host_name: string | null
+          id: string
+          is_active: boolean | null
+          schedule_days: string[] | null
+          schedule_time: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          duration_minutes?: number | null
+          host_name?: string | null
+          id?: string
+          is_active?: boolean | null
+          schedule_days?: string[] | null
+          schedule_time?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          duration_minutes?: number | null
+          host_name?: string | null
+          id?: string
+          is_active?: boolean | null
+          schedule_days?: string[] | null
+          schedule_time?: string | null
+          title?: string
+          updated_at?: string
         }
         Relationships: []
       }

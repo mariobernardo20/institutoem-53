@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, Radio, Newspaper, FileText, BarChart3, Settings, LogOut, Briefcase, GraduationCap, Mail } from "lucide-react";
+import { Users, Radio, Newspaper, FileText, BarChart3, Settings, LogOut, Briefcase, GraduationCap, Mail, Shield } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { NewsAdmin } from "@/components/NewsAdmin";
@@ -17,6 +17,7 @@ import ScholarshipsManagement from "@/components/ScholarshipsManagement";
 import ContactManagement from "@/components/ContactManagement";
 import RadioPollsManagement from "@/components/RadioPollsManagement";
 import RadioCommentsManagement from "@/components/RadioCommentsManagement";
+import AdminUsersManagement from "@/components/AdminUsersManagement";
 
 interface ServiceRequest {
   id: string;
@@ -252,7 +253,10 @@ const Admin = () => {
             <TabsTrigger value="radio-programs">Programação</TabsTrigger>
             <TabsTrigger value="radio-polls">Enquetes</TabsTrigger>
             <TabsTrigger value="radio-comments">Comentários</TabsTrigger>
-            <TabsTrigger value="admins">Administradores</TabsTrigger>
+            <TabsTrigger value="admin-users">
+              <Shield className="h-4 w-4 mr-1" />
+              Usuários Admin
+            </TabsTrigger>
             <TabsTrigger value="settings">Configurações</TabsTrigger>
           </TabsList>
 
@@ -367,8 +371,8 @@ const Admin = () => {
             <RadioCommentsManagement />
           </TabsContent>
 
-          <TabsContent value="admins">
-            <AdminManagement />
+          <TabsContent value="admin-users">
+            <AdminUsersManagement />
           </TabsContent>
 
           <TabsContent value="settings">
