@@ -88,8 +88,11 @@ const AdminLogin = () => {
           await supabase.auth.signOut();
           setError("Acesso negado. Este login é apenas para administradores.");
         } else {
-          // Redirect to admin panel
-          window.location.href = "/admin";
+          // Successful admin login - redirect to admin panel
+          setSuccess("Login realizado com sucesso! Redirecionando...");
+          setTimeout(() => {
+            navigate("/admin");
+          }, 1000);
         }
       }
     } catch (err) {
