@@ -4,11 +4,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { Shield } from "lucide-react";
+import { Shield, UserPlus } from "lucide-react";
 
 const AdminLogin = () => {
   const [loading, setLoading] = useState(false);
@@ -17,10 +18,20 @@ const AdminLogin = () => {
   const { isAdmin, user } = useAuth();
 
   // Form states
-  const [formData, setFormData] = useState({
+  const [loginData, setLoginData] = useState({
     email: "",
     password: ""
   });
+
+  const [registerData, setRegisterData] = useState({
+    fullName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    adminCode: ""
+  });
+
+  const [success, setSuccess] = useState<string | null>(null);
 
   useEffect(() => {
     // Redirect if user is already logged in and is admin
@@ -31,23 +42,32 @@ const AdminLogin = () => {
     }
   }, [user, isAdmin, navigate]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setLoginData(prev => ({
       ...prev,
       [name]: value
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleRegisterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setRegisterData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    setSuccess(null);
 
     try {
       const { error, data } = await supabase.auth.signInWithPassword({
-        email: formData.email,
-        password: formData.password
+        email: loginData.email,
+        password: loginData.password
       });
 
       if (error) {
@@ -80,6 +100,81 @@ const AdminLogin = () => {
     }
   };
 
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    setSuccess(null);
+
+    // Validações
+    if (registerData.password !== registerData.confirmPassword) {
+      setError("As senhas não coincidem");
+      setLoading(false);
+      return;
+    }
+
+    if (registerData.password.length < 6) {
+      setError("A senha deve ter pelo menos 6 caracteres");
+      setLoading(false);
+      return;
+    }
+
+    if (registerData.adminCode !== "ADMIN2024") {
+      setError("Código administrativo inválido");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const { error, data } = await supabase.auth.signUp({
+        email: registerData.email,
+        password: registerData.password,
+        options: {
+          data: {
+            full_name: registerData.fullName,
+            role: 'admin'
+          }
+        }
+      });
+
+      if (error) {
+        if (error.message.includes("User already registered")) {
+          setError("Este email já está cadastrado");
+        } else {
+          setError(error.message);
+        }
+      } else if (data.user) {
+        // Create profile with admin role
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert({
+            id: data.user.id,
+            user_id: data.user.id,
+            email: registerData.email,
+            full_name: registerData.fullName,
+            role: 'admin'
+          });
+
+        if (profileError) {
+          setError("Erro ao criar perfil administrativo");
+        } else {
+          setSuccess("Conta administrativa criada com sucesso! Verifique seu email para confirmar.");
+          setRegisterData({
+            fullName: "",
+            email: "",
+            password: "",
+            confirmPassword: "",
+            adminCode: ""
+          });
+        }
+      }
+    } catch (err) {
+      setError("Erro inesperado. Tente novamente.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
@@ -101,39 +196,132 @@ const AdminLogin = () => {
         </CardHeader>
         
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email do Administrador</Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                value={formData.email}
-                onChange={handleInputChange}
-                required
-                disabled={loading}
-                placeholder="Digite seu email administrativo"
-              />
-            </div>
+          <Tabs defaultValue="login" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="login" className="flex items-center gap-2">
+                <Shield className="h-4 w-4" />
+                Entrar
+              </TabsTrigger>
+              <TabsTrigger value="register" className="flex items-center gap-2">
+                <UserPlus className="h-4 w-4" />
+                Criar Conta
+              </TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="login" className="space-y-4 mt-6">
+              <form onSubmit={handleLogin} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="login-email">Email do Administrador</Label>
+                  <Input
+                    id="login-email"
+                    name="email"
+                    type="email"
+                    value={loginData.email}
+                    onChange={handleLoginChange}
+                    required
+                    disabled={loading}
+                    placeholder="Digite seu email administrativo"
+                  />
+                </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="password">Senha</Label>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                value={formData.password}
-                onChange={handleInputChange}
-                required
-                disabled={loading}
-                placeholder="Digite sua senha"
-              />
-            </div>
+                <div className="space-y-2">
+                  <Label htmlFor="login-password">Senha</Label>
+                  <Input
+                    id="login-password"
+                    name="password"
+                    type="password"
+                    value={loginData.password}
+                    onChange={handleLoginChange}
+                    required
+                    disabled={loading}
+                    placeholder="Digite sua senha"
+                  />
+                </div>
 
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Verificando..." : "Entrar como Admin"}
-            </Button>
-          </form>
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading ? "Verificando..." : "Entrar como Admin"}
+                </Button>
+              </form>
+            </TabsContent>
+
+            <TabsContent value="register" className="space-y-4 mt-6">
+              <form onSubmit={handleRegister} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="register-fullName">Nome Completo</Label>
+                  <Input
+                    id="register-fullName"
+                    name="fullName"
+                    type="text"
+                    value={registerData.fullName}
+                    onChange={handleRegisterChange}
+                    required
+                    disabled={loading}
+                    placeholder="Digite seu nome completo"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="register-email">Email</Label>
+                  <Input
+                    id="register-email"
+                    name="email"
+                    type="email"
+                    value={registerData.email}
+                    onChange={handleRegisterChange}
+                    required
+                    disabled={loading}
+                    placeholder="Digite seu email"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="register-password">Senha</Label>
+                  <Input
+                    id="register-password"
+                    name="password"
+                    type="password"
+                    value={registerData.password}
+                    onChange={handleRegisterChange}
+                    required
+                    disabled={loading}
+                    placeholder="Mínimo 6 caracteres"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="register-confirmPassword">Confirmar Senha</Label>
+                  <Input
+                    id="register-confirmPassword"
+                    name="confirmPassword"
+                    type="password"
+                    value={registerData.confirmPassword}
+                    onChange={handleRegisterChange}
+                    required
+                    disabled={loading}
+                    placeholder="Digite a senha novamente"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="register-adminCode">Código Administrativo</Label>
+                  <Input
+                    id="register-adminCode"
+                    name="adminCode"
+                    type="password"
+                    value={registerData.adminCode}
+                    onChange={handleRegisterChange}
+                    required
+                    disabled={loading}
+                    placeholder="Código especial para admin"
+                  />
+                </div>
+
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading ? "Criando conta..." : "Criar Conta Admin"}
+                </Button>
+              </form>
+            </TabsContent>
+          </Tabs>
 
           <div className="mt-6">
             <div className="relative">
@@ -165,6 +353,12 @@ const AdminLogin = () => {
               </Button>
             </div>
           </div>
+
+          {success && (
+            <Alert className="mt-4">
+              <AlertDescription className="text-green-600">{success}</AlertDescription>
+            </Alert>
+          )}
 
           {error && (
             <Alert variant="destructive" className="mt-4">
