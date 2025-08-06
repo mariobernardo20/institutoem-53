@@ -75,14 +75,27 @@ export const RadioProgramManagement = () => {
     
     try {
       if (editingProgram) {
-        await updateProgram(editingProgram.id!, formData);
-      } else {
-        const programData = {
-          ...formData,
+        const updateData = {
           title: formData.name,
           host_name: formData.host,
+          description: formData.description,
           schedule_time: formData.start_time,
-          duration_minutes: 60,
+          duration_minutes: calculateDuration(formData.start_time, formData.end_time),
+          is_active: true
+        };
+        await updateProgram(editingProgram.id!, updateData);
+      } else {
+        const programData = {
+          title: formData.name,
+          name: formData.name,
+          host_name: formData.host,
+          host: formData.host,
+          description: formData.description,
+          day_of_week: formData.day_of_week,
+          start_time: formData.start_time,
+          end_time: formData.end_time,
+          schedule_time: formData.start_time,
+          duration_minutes: calculateDuration(formData.start_time, formData.end_time),
           is_active: true
         };
         await createProgram(programData);
@@ -91,6 +104,14 @@ export const RadioProgramManagement = () => {
     } catch (error) {
       // Error handled in hook
     }
+  };
+
+  const calculateDuration = (start: string, end: string): number => {
+    const [startHour, startMinute] = start.split(':').map(Number);
+    const [endHour, endMinute] = end.split(':').map(Number);
+    const startTotal = startHour * 60 + startMinute;
+    const endTotal = endHour * 60 + endMinute;
+    return endTotal - startTotal;
   };
 
   const handleDelete = async (id: string) => {

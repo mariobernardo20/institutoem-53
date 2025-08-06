@@ -11,6 +11,7 @@ import Auth from "./pages/Auth";
 import Radio from "./pages/Radio";
 import Candidates from "./pages/Candidates";
 import CandidateProfile from "./pages/CandidateProfile";
+import { CandidateDashboard } from "./pages/CandidateDashboard";
 import Admin from "./pages/Admin";
 import Immigration from "./pages/Immigration";
 import Jobs from "./pages/Jobs";
@@ -43,6 +44,7 @@ const App = () => (
               <Route path="/radio" element={<Radio />} />
               <Route path="/candidatos" element={<Candidates />} />
               <Route path="/candidate-profile" element={<CandidateProfile />} />
+              <Route path="/candidate-dashboard" element={<CandidateDashboard />} />
               <Route path="/candidato/:id" element={<CandidateProfile />} />
               <Route path="/imigracao" element={<Immigration />} />
               <Route path="/jobs" element={<Jobs />} />
