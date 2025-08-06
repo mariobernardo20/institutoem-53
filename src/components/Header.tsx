@@ -20,8 +20,19 @@ const Header = () => {
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const handleSignOut = async () => {
-    await signOut();
-    navigate("/");
+    try {
+      const { error } = await signOut();
+      if (error) {
+        console.error('Erro ao fazer logout:', error);
+      } else {
+        // Forçar recarga da página para limpar completamente a sessão
+        window.location.href = "/";
+      }
+    } catch (error) {
+      console.error('Erro inesperado ao fazer logout:', error);
+      // Mesmo com erro, redirecionar para a página inicial
+      window.location.href = "/";
+    }
   };
   const mainMenuItems = [{
     label: t('nav.news'),
