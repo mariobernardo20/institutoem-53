@@ -1,23 +1,12 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { Candidate } from "@/types/database";
 
-export interface Candidate {
-  id: string;
-  name: string;
-  area: string;
-  experience_years: number;
-  email: string;
-  phone: string;
-  description: string;
-  skills: string[];
-  image_url?: string;
-  created_at: string;
-  location?: string;
-  education?: string;
-  certifications?: string[];
-  languages?: string[];
-}
+export type { Candidate };
+import { Tables } from "@/integrations/supabase/types";
+
+type DbCandidate = Tables<"candidates">;
 
 export const useCandidates = () => {
   const [candidates, setCandidates] = useState<Candidate[]>([]);
@@ -37,7 +26,13 @@ export const useCandidates = () => {
 
       if (error) throw error;
       
-      const candidatesData = data || [];
+      const candidatesData = (data || []).map((candidate: DbCandidate): Candidate => ({
+        ...candidate,
+        name: candidate.full_name,
+        area: candidate.position || 'Não especificado',
+        description: `${candidate.experience_years || 0} anos de experiência`,
+        skills: candidate.skills || []
+      }));
       setCandidates(candidatesData);
       
       // Atualizar cache local para sincronização entre páginas
@@ -60,35 +55,41 @@ export const useCandidates = () => {
           {
             id: "1",
             name: "Ana Silva",
+            full_name: "Ana Silva",
             area: "Tecnologia da Informação",
             experience_years: 5,
             email: "ana.silva@email.com",
             phone: "+351 912 345 678",
             description: "Desenvolvedora Full Stack com experiência em React, Node.js e bases de dados. Paixão por criar soluções inovadoras.",
             skills: ["React", "Node.js", "TypeScript", "PostgreSQL", "Docker"],
-            created_at: new Date().toISOString()
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
           },
           {
             id: "2",
             name: "João Santos",
+            full_name: "João Santos",
             area: "Design Gráfico",
             experience_years: 3,
             email: "joao.santos@email.com",
             phone: "+351 913 456 789",
             description: "Designer gráfico criativo com especialização em branding e design digital. Experiência em agências de publicidade.",
             skills: ["Photoshop", "Illustrator", "Figma", "Branding", "UI/UX"],
-            created_at: new Date(Date.now() - 86400000).toISOString()
+            created_at: new Date(Date.now() - 86400000).toISOString(),
+            updated_at: new Date().toISOString()
           },
           {
             id: "3",
             name: "Maria Costa",
+            full_name: "Maria Costa",
             area: "Marketing Digital",
             experience_years: 7,
             email: "maria.costa@email.com",
             phone: "+351 914 567 890",
             description: "Especialista em marketing digital com foco em SEO, SEM e estratégias de content marketing.",
             skills: ["SEO", "Google Ads", "Analytics", "Social Media", "Content Marketing"],
-            created_at: new Date(Date.now() - 172800000).toISOString()
+            created_at: new Date(Date.now() - 172800000).toISOString(),
+            updated_at: new Date().toISOString()
           }
         ];
         setCandidates(mockCandidates);
@@ -122,7 +123,15 @@ export const useCandidates = () => {
         .single();
 
       if (error) throw error;
-      return data;
+      if (!data) return null;
+      
+      return {
+        ...data,
+        name: data.full_name,
+        area: data.position || 'Não especificado',
+        description: `${data.experience_years || 0} anos de experiência`,
+        skills: data.skills || []
+      };
     } catch (error) {
       console.error('Error fetching candidate by ID:', error);
       return null;

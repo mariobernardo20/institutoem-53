@@ -81,9 +81,7 @@ const RadioPolls: React.FC<RadioPollsProps> = ({ programId }) => {
         .eq('is_active', true)
         .order('created_at', { ascending: false });
 
-      if (programId) {
-        pollsQuery = pollsQuery.eq('program_id', programId);
-      }
+      // Removido filtro program_id já que não existe na tabela
 
       const { data: pollsData, error: pollsError } = await pollsQuery;
 

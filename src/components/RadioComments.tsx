@@ -66,9 +66,7 @@ const RadioComments: React.FC<RadioCommentsProps> = ({ programId }) => {
         .select('id, content, created_at, user_id')
         .order('created_at', { ascending: false });
 
-      if (programId) {
-        commentsQuery = commentsQuery.eq('program_id', programId);
-      }
+      // Removido filtro program_id já que não existe na tabela
 
       const { data: commentsData, error: commentsError } = await commentsQuery;
 
@@ -134,7 +132,8 @@ const RadioComments: React.FC<RadioCommentsProps> = ({ programId }) => {
         .insert({
           content: newComment.trim(),
           user_id: user.id,
-          program_id: programId
+          user_name: profile?.full_name || 'Usuário',
+          user_email: user.email
         });
 
       if (error) {

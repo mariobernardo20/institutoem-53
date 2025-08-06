@@ -77,7 +77,15 @@ export const RadioProgramManagement = () => {
       if (editingProgram) {
         await updateProgram(editingProgram.id!, formData);
       } else {
-        await createProgram(formData);
+        const programData = {
+          ...formData,
+          title: formData.name,
+          host_name: formData.host,
+          schedule_time: formData.start_time,
+          duration_minutes: 60,
+          is_active: true
+        };
+        await createProgram(programData);
       }
       resetForm();
     } catch (error) {

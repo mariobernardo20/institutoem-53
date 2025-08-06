@@ -69,7 +69,9 @@ export const useNews = (category: string) => {
           image_url: "/lovable-uploads/fb46a527-5bbf-4865-a44c-b3109d663fa6.png",
           published_at: new Date().toISOString(),
           created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
+          author_id: null,
+          status: "published"
         },
         {
           id: "2", 
@@ -79,7 +81,9 @@ export const useNews = (category: string) => {
           image_url: "/lovable-uploads/fb46a527-5bbf-4865-a44c-b3109d663fa6.png",
           published_at: new Date(Date.now() - 3600000).toISOString(),
           created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
+          author_id: null,
+          status: "published"
         },
         {
           id: "3",
@@ -89,7 +93,9 @@ export const useNews = (category: string) => {
           image_url: "/lovable-uploads/fb46a527-5bbf-4865-a44c-b3109d663fa6.png",
           published_at: new Date(Date.now() - 7200000).toISOString(),
           created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
+          author_id: null,
+          status: "published"
         }
       ],
       "Direito": [
@@ -101,7 +107,9 @@ export const useNews = (category: string) => {
           image_url: "/lovable-uploads/fb46a527-5bbf-4865-a44c-b3109d663fa6.png",
           published_at: new Date().toISOString(),
           created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
+          author_id: null,
+          status: "published"
         },
         {
           id: "5",
@@ -111,7 +119,9 @@ export const useNews = (category: string) => {
           image_url: "/lovable-uploads/fb46a527-5bbf-4865-a44c-b3109d663fa6.png",
           published_at: new Date(Date.now() - 1800000).toISOString(),
           created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
+          author_id: null,
+          status: "published"
         }
       ]
     };

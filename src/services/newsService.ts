@@ -148,7 +148,9 @@ export class NewsService {
               content: newsItem.content,
               category: category,
               image_url: "/lovable-uploads/fb46a527-5bbf-4865-a44c-b3109d663fa6.png",
-              published_at: newsItem.publishedAt
+              published_at: newsItem.publishedAt,
+              author_id: null,
+              status: "published"
             });
           }
         }

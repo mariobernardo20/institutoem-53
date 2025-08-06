@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { NewsService } from "@/services/newsService";
+import { RealNewsService } from "@/services/realNewsService";
 import { NewsManagement } from "./NewsManagement";
 import { AdminImageUpload } from "./AdminImageUpload";
 import { useToast } from "@/components/ui/use-toast";
@@ -16,8 +17,8 @@ export const NewsAdmin = () => {
   const loadInitialNews = async () => {
     setLoading(true);
     try {
-      // Carregar notícias de imigração
-      const immigrationNews = await NewsService.searchRealNews("Imigração", "imigração portugal");
+      // Carregar notícias reais de imigração
+      const immigrationNews = await RealNewsService.fetchRealNews("Imigração");
       for (const news of immigrationNews) {
         await NewsService.saveNews({
           title: news.title,
@@ -30,8 +31,8 @@ export const NewsAdmin = () => {
         });
       }
 
-      // Carregar notícias de direito
-      const lawNews = await NewsService.searchRealNews("Direito", "direito portugal");
+      // Carregar notícias reais de direito
+      const lawNews = await RealNewsService.fetchRealNews("Direito");
       for (const news of lawNews) {
         await NewsService.saveNews({
           title: news.title,
@@ -62,7 +63,7 @@ export const NewsAdmin = () => {
   const updateDailyNews = async () => {
     setLoading(true);
     try {
-      await NewsService.updateDailyNews();
+      await RealNewsService.updateDailyNews();
       toast({
         title: "Atualização concluída!",
         description: "Notícias atualizadas com sucesso.",

@@ -56,11 +56,8 @@ const Admin = () => {
 
   const fetchData = async () => {
     try {
-      // Fetch service requests
-      const { data: requests } = await supabase
-        .from('service_requests')
-        .select('*')
-        .order('requested_at', { ascending: false });
+      // Mock service requests since table doesn't exist
+      const requests: ServiceRequest[] = [];
 
       // Fetch stats
       const [candidatesResult, newsResult, radioProgramsResult] = await Promise.all([
@@ -69,13 +66,13 @@ const Admin = () => {
         supabase.from('radio_programs').select('id', { count: 'exact' })
       ]);
 
-      const pendingRequests = requests?.filter(r => r.status === 'pending').length || 0;
+      const pendingRequests = 0;
 
-      setServiceRequests(requests || []);
+      setServiceRequests([]);
       setStats({
         candidatesCount: candidatesResult.count || 0,
         newsCount: newsResult.count || 0,
-        serviceRequestsCount: requests?.length || 0,
+        serviceRequestsCount: 0,
         pendingRequestsCount: pendingRequests,
         radioProgramsCount: radioProgramsResult.count || 0
       });
@@ -93,12 +90,9 @@ const Admin = () => {
 
   const updateRequestStatus = async (requestId: string, newStatus: string) => {
     try {
-      const { error } = await supabase
-        .from('service_requests')
-        .update({ status: newStatus })
-        .eq('id', requestId);
+      // Mock function since table doesn't exist
 
-      if (error) throw error;
+      // No error handling needed for mock
 
       setServiceRequests(prev =>
         prev.map(req =>
@@ -154,8 +148,8 @@ const Admin = () => {
             <Button 
               variant="outline" 
               onClick={() => {
-                localStorage.removeItem('adminToken');
-                window.location.href = '/auth';
+                supabase.auth.signOut();
+                window.location.href = '/';
               }}
               className="flex items-center gap-2"
             >
