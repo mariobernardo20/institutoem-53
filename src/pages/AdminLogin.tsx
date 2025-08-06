@@ -5,7 +5,6 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -14,15 +13,17 @@ import { Shield, UserPlus } from "lucide-react";
 const AdminLogin = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const navigate = useNavigate();
   const { isAdmin, user } = useAuth();
 
-  // Form states
+  // Login form data
   const [loginData, setLoginData] = useState({
     email: "",
     password: ""
   });
 
+  // Register form data
   const [registerData, setRegisterData] = useState({
     fullName: "",
     email: "",
@@ -30,8 +31,6 @@ const AdminLogin = () => {
     confirmPassword: "",
     adminCode: ""
   });
-
-  const [success, setSuccess] = useState<string | null>(null);
 
   useEffect(() => {
     // Redirect if user is already logged in and is admin
