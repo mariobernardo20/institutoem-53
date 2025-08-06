@@ -128,21 +128,7 @@ const Radio = () => {
       <Header />
       
       {/* Header with Live Status */}
-      <div className="bg-slate-700 text-white p-4">
-        <div className="container mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <RadioIcon className="h-6 w-6" />
-            <span className="text-lg font-medium">AO VIVO - Rádio Instituto Empreendedor</span>
-            <Badge className="bg-red-500 text-white text-xs px-2 py-1 rounded">● LIVE</Badge>
-          </div>
-          <Button variant="ghost" size="sm" className="text-white hover:bg-slate-600" asChild>
-            <Link to="/" className="flex items-center gap-2">
-              <ArrowLeft className="h-4 w-4" />
-              Voltar
-            </Link>
-          </Button>
-        </div>
-      </div>
+      
 
       {/* Main Radio Info Section */}
       <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white py-8">
@@ -313,11 +299,7 @@ const Radio = () => {
       {/* Instituto Empreendedor Information Section */}
       <div className="bg-white border-t border-gray-200">
         <div className="container mx-auto px-4 py-8">
-          <img 
-            src="/lovable-uploads/53771331-bace-4f5a-85f6-ef64b646b7b2.png" 
-            alt="Instituto Empreendedor - Informações e Links"
-            className="w-full max-w-4xl mx-auto"
-          />
+          <img src="/lovable-uploads/53771331-bace-4f5a-85f6-ef64b646b7b2.png" alt="Instituto Empreendedor - Informações e Links" className="w-full max-w-4xl mx-auto" />
         </div>
       </div>
 
