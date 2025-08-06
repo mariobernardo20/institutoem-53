@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { User, Session } from "@supabase/supabase-js";
 
 const Auth = () => {
@@ -16,6 +16,8 @@ const Auth = () => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const activeTab = searchParams.get('tab') || 'login';
 
   // Form states
   const [loginEmail, setLoginEmail] = useState("");
@@ -126,6 +128,9 @@ const Auth = () => {
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
+          <div className="flex justify-center mb-4">
+            <img src="/lovable-uploads/304d008b-b833-4324-ac1c-b16506f1f78e.png" alt="Instituto Empreendedor" className="h-12 object-contain" />
+          </div>
           <CardTitle className="text-2xl font-bold">Instituto Empreendedor</CardTitle>
           <CardDescription>
             Entre ou crie sua conta para continuar
@@ -133,7 +138,7 @@ const Auth = () => {
         </CardHeader>
         
         <CardContent>
-          <Tabs defaultValue="login" className="w-full">
+          <Tabs value={activeTab} className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="login">Entrar</TabsTrigger>
               <TabsTrigger value="signup">Registrar</TabsTrigger>
