@@ -40,6 +40,12 @@ const OptimizedRadioPolls: React.FC<OptimizedRadioPollsProps> = ({ programId }) 
   const [loading, setLoading] = useState(true);
   const [voting, setVoting] = useState<string | null>(null);
 
+  // Helper function to check if poll is expired
+  const isExpired = (poll: Poll) => {
+    if (!poll.expires_at) return false;
+    return new Date(poll.expires_at) < new Date();
+  };
+
   // Memoize expensive calculations
   const activePollsWithStats = useMemo(() => {
     return polls.filter(poll => poll.is_active && !isExpired(poll));
@@ -212,10 +218,6 @@ const OptimizedRadioPolls: React.FC<OptimizedRadioPollsProps> = ({ programId }) 
     }
   };
 
-  const isExpired = (poll: Poll) => {
-    if (!poll.expires_at) return false;
-    return new Date(poll.expires_at) < new Date();
-  };
 
   if (loading) {
     return (

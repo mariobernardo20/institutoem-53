@@ -18,6 +18,19 @@ const SearchFilters = ({
       onFilterChange(filter);
     }
   };
-  return;
+  return (
+    <div className="flex flex-wrap gap-2 mb-6">
+      {filters.map((filter) => (
+        <Button
+          key={filter}
+          variant={activeFilter === filter ? "default" : "outline"}
+          size="sm"
+          onClick={() => handleFilterChange(filter)}
+        >
+          {filter}
+        </Button>
+      ))}
+    </div>
+  );
 };
 export default SearchFilters;
