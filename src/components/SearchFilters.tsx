@@ -1,3 +1,4 @@
+import React from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
@@ -6,10 +7,10 @@ interface SearchFiltersProps {
   onFilterChange: (filter: string) => void;
 }
 
-const SearchFilters = ({
+const SearchFilters: React.FC<SearchFiltersProps> = ({
   activeFilter,
   onFilterChange
-}: SearchFiltersProps) => {
+}) => {
   const navigate = useNavigate();
   const filters = ["Todas", "Imigração", "Direito", "Empreendedorismo", "Ação Social", "Entretenimento", "Espiritualidade", "Negócios", "Tecnologia", "Saúde", "Economia", "Educação", "Preços"];
   
