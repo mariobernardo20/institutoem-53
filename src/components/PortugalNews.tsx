@@ -22,6 +22,13 @@ export const PortugalNews = () => {
 
   useEffect(() => {
     fetchPortugalNews();
+    
+    // Atualização automática a cada 15 minutos
+    const interval = setInterval(() => {
+      fetchPortugalNews();
+    }, 15 * 60 * 1000); // 15 minutos
+    
+    return () => clearInterval(interval);
   }, []);
 
   const fetchPortugalNews = async () => {
@@ -135,13 +142,24 @@ export const PortugalNews = () => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Newspaper className="h-5 w-5" />
-          Notícias de Portugal
-          <Badge variant="outline" className="ml-auto text-xs">
-            Tempo Real
-          </Badge>
-        </CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2">
+            <Newspaper className="h-5 w-5" />
+            Notícias de Portugal
+          </CardTitle>
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" className="text-xs">
+              Tempo Real
+            </Badge>
+            <button
+              onClick={fetchPortugalNews}
+              className="p-1 hover:bg-gray-100 rounded"
+              title="Atualizar notícias"
+            >
+              <Clock className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="space-y-4 max-h-80 overflow-y-auto">

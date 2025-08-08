@@ -35,6 +35,7 @@ const PackageComparison = lazy(() => import("./pages/PackageComparison"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 const TermsConditions = lazy(() => import("./pages/TermsConditions"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const NewsDetail = lazy(() => import("./pages/NewsDetail"));
 
 // Loading fallback component
 const LoadingFallback = () => {
@@ -205,6 +206,16 @@ function App() {
               <Route path="/termos-condicoes" element={
                 <Suspense fallback={<LoadingFallback />}>
                   <TermsConditions />
+                </Suspense>
+              } />
+              <Route path="/news/:id" element={
+                <Suspense fallback={<LoadingFallback />}>
+                  <NewsDetail />
+                </Suspense>
+              } />
+              <Route path="/noticia/:id" element={
+                <Suspense fallback={<LoadingFallback />}>
+                  <NewsDetail />
                 </Suspense>
               } />
               <Route path="*" element={
