@@ -103,6 +103,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
+  // Safety: ensure loading state doesn't get stuck
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setLoading(false);
+    }, 6000);
+    return () => clearTimeout(timeout);
+  }, [setLoading]);
+
   // Auto logout on session expiry
   useEffect(() => {
     if (!user) return;

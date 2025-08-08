@@ -92,6 +92,18 @@ const Admin = () => {
       fetchData();
     }
   }, [isAdmin]);
+  
+  // Safety fallback to avoid infinite loading
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (authLoading || (isAdmin === null && loading)) {
+        console.warn('Tempo limite atingido no painel admin - aplicando fallback');
+        setIsAdmin(false);
+        setLoading(false);
+      }
+    }, 7000);
+    return () => clearTimeout(timer);
+  }, [authLoading, isAdmin, loading]);
 
   const fetchData = async () => {
     try {

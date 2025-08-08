@@ -1,13 +1,14 @@
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { Button } from "@/components/ui/button";
 import { QueryProvider } from "@/providers/QueryProvider";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import { AuthProvider } from "./providers/AuthProvider";
 
 // Lazy load pages for better performance
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 // Critical pages - load immediately
@@ -36,19 +37,35 @@ const TermsConditions = lazy(() => import("./pages/TermsConditions"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Loading fallback component
-const LoadingFallback = () => (
-  <div className="min-h-screen bg-background p-8">
-    <div className="container mx-auto space-y-8">
-      <Skeleton className="h-12 w-48" />
-      <Skeleton className="h-64 w-full" />
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Skeleton className="h-32" />
-        <Skeleton className="h-32" />
-        <Skeleton className="h-32" />
+const LoadingFallback = () => {
+  const [slow, setSlow] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setSlow(true), 5000);
+    return () => clearTimeout(t);
+  }, []);
+  
+  return (
+    <div className="min-h-screen bg-background p-8">
+      <div className="container mx-auto space-y-8">
+        <Skeleton className="h-12 w-48" />
+        <Skeleton className="h-64 w-full" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Skeleton className="h-32" />
+          <Skeleton className="h-32" />
+          <Skeleton className="h-32" />
+        </div>
+        {slow && (
+          <div className="flex items-center justify-between rounded-md border p-4">
+            <p className="text-sm text-muted-foreground">Está demorando mais que o normal. Deseja recarregar?</p>
+            <Button onClick={() => window.location.reload()} size="sm" variant="outline">
+              Recarregar
+            </Button>
+          </div>
+        )}
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 function App() {
   return (
