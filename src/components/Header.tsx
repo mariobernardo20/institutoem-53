@@ -22,12 +22,12 @@ const Header = () => {
   const handleSignOut = async () => {
     try {
       await signOut();
-      // Forçar recarga da página para limpar completamente a sessão
-      window.location.href = "/";
+      setMobileMenuOpen(false);
+      navigate("/");
     } catch (error) {
       console.error('Erro inesperado ao fazer logout:', error);
-      // Mesmo com erro, redirecionar para a página inicial
-      window.location.href = "/";
+      setMobileMenuOpen(false);
+      navigate("/");
     }
   };
   const mainMenuItems = [{
