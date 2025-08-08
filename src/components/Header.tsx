@@ -3,7 +3,7 @@ import { Search, Radio, Menu, X, User, LogOut } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/providers/AuthProvider";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 const Header = () => {
   const {
@@ -21,13 +21,9 @@ const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const handleSignOut = async () => {
     try {
-      const { error } = await signOut();
-      if (error) {
-        console.error('Erro ao fazer logout:', error);
-      } else {
-        // Forçar recarga da página para limpar completamente a sessão
-        window.location.href = "/";
-      }
+      await signOut();
+      // Forçar recarga da página para limpar completamente a sessão
+      window.location.href = "/";
     } catch (error) {
       console.error('Erro inesperado ao fazer logout:', error);
       // Mesmo com erro, redirecionar para a página inicial

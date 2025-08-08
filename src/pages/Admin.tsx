@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Users, Radio, Newspaper, FileText, BarChart3, LogOut, Shield, Loader } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/providers/AuthProvider";
 import { NewsAdmin } from "@/components/NewsAdmin";
 import { AdminManagement } from "@/components/AdminManagement";
 import { RadioTeamManagement } from "@/components/RadioTeamManagement";
