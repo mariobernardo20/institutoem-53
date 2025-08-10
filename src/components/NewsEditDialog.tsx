@@ -24,6 +24,7 @@ export const NewsEditDialog = ({ open, onOpenChange, newsItem, onSaved }: NewsEd
   const [content, setContent] = useState("");
   const [category, setCategory] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+  const [isFeatured, setIsFeatured] = useState(false);
   const [loading, setSaving] = useState(false);
   const { toast } = useToast();
 
@@ -33,11 +34,13 @@ export const NewsEditDialog = ({ open, onOpenChange, newsItem, onSaved }: NewsEd
       setContent(newsItem.content);
       setCategory(newsItem.category);
       setImageUrl(newsItem.image_url || "");
+      setIsFeatured(newsItem.is_featured || false);
     } else {
       setTitle("");
       setContent("");
       setCategory("");
       setImageUrl("");
+      setIsFeatured(false);
     }
   }, [newsItem]);
 
@@ -59,7 +62,8 @@ export const NewsEditDialog = ({ open, onOpenChange, newsItem, onSaved }: NewsEd
           title: title.trim(),
           content: content.trim(),
           category,
-          image_url: imageUrl || "/lovable-uploads/fb46a527-5bbf-4865-a44c-b3109d663fa6.png"
+          image_url: imageUrl || "/lovable-uploads/fb46a527-5bbf-4865-a44c-b3109d663fa6.png",
+          is_featured: isFeatured
         });
 
         if (success) {
@@ -81,7 +85,8 @@ export const NewsEditDialog = ({ open, onOpenChange, newsItem, onSaved }: NewsEd
           image_url: imageUrl || "/lovable-uploads/fb46a527-5bbf-4865-a44c-b3109d663fa6.png",
           published_at: new Date().toISOString(),
           status: "published",
-          author_id: null
+          author_id: null,
+          is_featured: isFeatured
         });
 
         if (success) {
@@ -136,6 +141,16 @@ export const NewsEditDialog = ({ open, onOpenChange, newsItem, onSaved }: NewsEd
               <SelectContent>
                 <SelectItem value="Imigração">📋 Imigração</SelectItem>
                 <SelectItem value="Direito">⚖️ Direito</SelectItem>
+                <SelectItem value="Empreendedorismo">🚀 Empreendedorismo</SelectItem>
+                <SelectItem value="Ação Social">🤝 Ação Social</SelectItem>
+                <SelectItem value="Entretenimento">🎭 Entretenimento</SelectItem>
+                <SelectItem value="Espiritualidade">🕯️ Espiritualidade</SelectItem>
+                <SelectItem value="Negócios">💼 Negócios</SelectItem>
+                <SelectItem value="Tecnologia">💻 Tecnologia</SelectItem>
+                <SelectItem value="Saúde">🏥 Saúde</SelectItem>
+                <SelectItem value="Economia">💰 Economia</SelectItem>
+                <SelectItem value="Educação">📚 Educação</SelectItem>
+                <SelectItem value="Preços">💲 Preços</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -160,6 +175,19 @@ export const NewsEditDialog = ({ open, onOpenChange, newsItem, onSaved }: NewsEd
               placeholder="Digite o conteúdo da notícia"
               className="mt-1 min-h-[200px]"
             />
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              id="featured"
+              checked={isFeatured}
+              onChange={(e) => setIsFeatured(e.target.checked)}
+              className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+            />
+            <Label htmlFor="featured" className="text-sm font-medium">
+              ⭐ Marcar como Destaque (aparecerá na página principal)
+            </Label>
           </div>
 
           <div className="flex justify-end gap-2 pt-4">

@@ -150,7 +150,8 @@ export class NewsService {
               image_url: "/lovable-uploads/fb46a527-5bbf-4865-a44c-b3109d663fa6.png",
               published_at: newsItem.publishedAt,
               author_id: null,
-              status: "published"
+              status: "published",
+              is_featured: false
             });
           }
         }
@@ -170,6 +171,24 @@ export class NewsService {
     if (error) {
       console.error("Erro ao buscar todas as notícias:", error);
       throw error;
+    }
+
+    return data || [];
+  }
+
+  // Buscar notícias em destaque
+  static async getFeaturedNews(): Promise<NewsItem[]> {
+    const { data, error } = await supabase
+      .from("news")
+      .select("*")
+      .eq("is_featured", true)
+      .eq("status", "published")
+      .order("published_at", { ascending: false })
+      .limit(6);
+
+    if (error) {
+      console.error("Erro ao buscar notícias em destaque:", error);
+      return [];
     }
 
     return data || [];

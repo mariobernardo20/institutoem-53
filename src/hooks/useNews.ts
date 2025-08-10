@@ -71,7 +71,8 @@ export const useNews = (category: string) => {
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
           author_id: null,
-          status: "published"
+          status: "published",
+          is_featured: false
         },
         {
           id: "2", 
@@ -83,7 +84,8 @@ export const useNews = (category: string) => {
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
           author_id: null,
-          status: "published"
+          status: "published",
+          is_featured: false
         },
         {
           id: "3",
@@ -95,7 +97,8 @@ export const useNews = (category: string) => {
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
           author_id: null,
-          status: "published"
+          status: "published",
+          is_featured: false
         }
       ],
       "Direito": [
@@ -109,7 +112,8 @@ export const useNews = (category: string) => {
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
           author_id: null,
-          status: "published"
+          status: "published",
+          is_featured: false
         },
         {
           id: "5",
@@ -121,7 +125,8 @@ export const useNews = (category: string) => {
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
           author_id: null,
-          status: "published"
+          status: "published",
+          is_featured: false
         }
       ]
     };

@@ -27,7 +27,8 @@ export const NewsAdmin = () => {
           image_url: "/lovable-uploads/fb46a527-5bbf-4865-a44c-b3109d663fa6.png",
           published_at: news.publishedAt,
           status: "published",
-          author_id: null
+          author_id: null,
+          is_featured: false
         });
       }
 
@@ -41,7 +42,8 @@ export const NewsAdmin = () => {
           image_url: "/lovable-uploads/fb46a527-5bbf-4865-a44c-b3109d663fa6.png",
           published_at: news.publishedAt,
           status: "published",
-          author_id: null
+          author_id: null,
+          is_featured: false
         });
       }
 
