@@ -19,16 +19,38 @@ export const useSearch = (searchQuery: string, category: string) => {
       let searchResults: NewsItem[];
       
       if (query.trim()) {
-        // Busca por texto
+        // Enhanced search with real news integration
         try {
+          // First try database search
           searchResults = await NewsService.searchNews(query, cat);
+          
+          // If no results found in database, try real news search
+          if (searchResults.length === 0) {
+            console.log("No database results, trying real news search...");
+            const { RealNewsService } = await import("@/services/realNewsService");
+            const realNewsResults = await RealNewsService.searchNews(query, cat);
+            
+            // Convert real news to NewsItem format for display
+            searchResults = realNewsResults.map((item, index) => ({
+              id: `real-${index}`,
+              title: item.title,
+              content: item.content,
+              category: cat,
+              image_url: "/lovable-uploads/fb46a527-5bbf-4865-a44c-b3109d663fa6.png",
+              published_at: item.publishedAt,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+              author_id: null,
+              status: "published" as const,
+              is_featured: false
+            }));
+          }
         } catch (dbError) {
-          console.error("Erro na busca do banco de dados, usando dados locais:", dbError);
-          // Fallback para dados simulados quando há erro no banco
+          console.error("Erro na busca, usando dados locais:", dbError);
           searchResults = await getLocalSearchResults(query, cat);
         }
       } else {
-        // Sem termo de busca, mostrar todas as notícias da categoria
+        // No search term, show all news for category
         try {
           if (cat === "Todas") {
             const [immigrationNews, lawNews] = await Promise.all([
@@ -40,6 +62,27 @@ export const useSearch = (searchQuery: string, category: string) => {
             );
           } else {
             searchResults = await NewsService.getNewsByCategory(cat);
+          }
+          
+          // If no database results, fetch from real news service
+          if (searchResults.length === 0) {
+            console.log("No database results, fetching real news...");
+            const { RealNewsService } = await import("@/services/realNewsService");
+            const realNewsResults = await RealNewsService.fetchRealNews(cat);
+            
+            searchResults = realNewsResults.map((item, index) => ({
+              id: `real-${index}`,
+              title: item.title,
+              content: item.content,
+              category: cat,
+              image_url: "/lovable-uploads/fb46a527-5bbf-4865-a44c-b3109d663fa6.png",
+              published_at: item.publishedAt,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+              author_id: null,
+              status: "published" as const,
+              is_featured: false
+            }));
           }
         } catch (dbError) {
           console.error("Erro ao buscar do banco de dados, usando dados locais:", dbError);

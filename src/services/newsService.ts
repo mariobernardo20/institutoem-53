@@ -69,95 +69,36 @@ export class NewsService {
     return true;
   }
 
-  // Buscar notícias de fontes reais (simulado - em produção usaria APIs reais)
+  // Enhanced search with real news integration
   static async searchRealNews(category: string, query: string): Promise<NewsSearchResult[]> {
-    // Em um ambiente real, aqui integraria com APIs como NewsAPI, Google News, etc.
-    // Por enquanto, retorno dados simulados mais realistas
-    
-    const mockNews: Record<string, NewsSearchResult[]> = {
-      "Imigração": [
-        {
-          title: "Portugal facilita renovação de autorizações de residência para imigrantes",
-          content: "O Governo português anunciou novas medidas para simplificar o processo de renovação de autorizações de residência, reduzindo os prazos de espera em até 50%. A medida beneficia especialmente cidadãos da CPLP.",
-          url: "https://www.portugal.gov.pt/imigracao-renovacao",
-          publishedAt: new Date().toISOString(),
-          source: "Portal do Governo Português"
-        },
-        {
-          title: "AIMA lança nova plataforma digital para pedidos de nacionalidade",
-          content: "A Agência para a Integração, Migrações e Asilo (AIMA) disponibiliza uma nova plataforma online que permite submeter pedidos de nacionalidade portuguesa de forma completamente digital.",
-          url: "https://www.aima.gov.pt/nacionalidade-digital",
-          publishedAt: new Date(Date.now() - 3600000).toISOString(),
-          source: "AIMA"
-        },
-        {
-          title: "Nova lei de imigração entra em vigor em 2025 com mudanças significativas",
-          content: "A nova legislação de imigração portuguesa, que entra em vigor no próximo ano, introduz alterações importantes nos critérios de concessão de vistos de trabalho e residência.",
-          url: "https://dre.pt/lei-imigracao-2025",
-          publishedAt: new Date(Date.now() - 7200000).toISOString(),
-          source: "Diário da República"
-        }
-      ],
-      "Direito": [
-        {
-          title: "Novo Código de Processo Civil simplifica procedimentos judiciais",
-          content: "As alterações ao Código de Processo Civil, aprovadas pelo Parlamento, introduzem medidas de simplificação e digitalização que prometem acelerar os processos judiciais em Portugal.",
-          url: "https://www.parlamento.pt/codigo-processo-civil",
-          publishedAt: new Date().toISOString(),
-          source: "Assembleia da República"
-        },
-        {
-          title: "Tribunal Constitucional declara inconstitucionalidade de artigo da Lei do Arrendamento",
-          content: "O Tribunal Constitucional português declarou a inconstitucionalidade de um artigo da Lei do Arrendamento Urbano, afetando milhares de contratos de arrendamento em todo o país.",
-          url: "https://www.tribunalconstitucional.pt/decisao-arrendamento",
-          publishedAt: new Date(Date.now() - 1800000).toISOString(),
-          source: "Tribunal Constitucional"
-        },
-        {
-          title: "Ministério da Justiça anuncia reforma do sistema de execuções",
-          content: "O Ministério da Justiça apresentou um plano abrangente de reforma do sistema de execuções, visando maior eficácia na cobrança de dívidas e proteção dos devedores.",
-          url: "https://www.mj.gov.pt/reforma-execucoes",
-          publishedAt: new Date(Date.now() - 5400000).toISOString(),
-          source: "Ministério da Justiça"
-        }
-      ]
-    };
-
-    return mockNews[category] || [];
+    try {
+      // Import here to avoid circular dependency
+      const { RealNewsService } = await import("./realNewsService");
+      
+      const realNews = await RealNewsService.searchNews(query, category);
+      
+      return realNews.map(item => ({
+        title: item.title,
+        content: item.content,
+        url: item.url || "#",
+        publishedAt: item.publishedAt,
+        source: item.source || "Fonte Externa"
+      }));
+    } catch (error) {
+      console.error("Error fetching real news:", error);
+      return [];
+    }
   }
 
-  // Atualizar notícias diariamente
+  // Enhanced daily news update with real news service
   static async updateDailyNews(): Promise<void> {
-    const categories = ["Imigração", "Direito"];
-    
-    for (const category of categories) {
-      try {
-        const newsResults = await this.searchRealNews(category, category);
-        
-        for (const newsItem of newsResults) {
-          // Verificar se a notícia já existe
-          const { data: existingNews } = await supabase
-            .from("news")
-            .select("id")
-            .eq("title", newsItem.title)
-            .single();
-
-          if (!existingNews) {
-            await this.saveNews({
-              title: newsItem.title,
-              content: newsItem.content,
-              category: category,
-              image_url: "/lovable-uploads/fb46a527-5bbf-4865-a44c-b3109d663fa6.png",
-              published_at: newsItem.publishedAt,
-              author_id: null,
-              status: "published",
-              is_featured: false
-            });
-          }
-        }
-      } catch (error) {
-        console.error(`Erro ao atualizar notícias de ${category}:`, error);
-      }
+    try {
+      // Use the new AutoNewsService for better news management
+      const { AutoNewsService } = await import("./autoNewsService");
+      await AutoNewsService.manualUpdate();
+    } catch (error) {
+      console.error("Error updating daily news:", error);
+      throw error;
     }
   }
 

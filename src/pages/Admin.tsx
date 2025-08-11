@@ -20,6 +20,7 @@ import ContactManagement from "@/components/ContactManagement";
 import RadioPollsManagement from "@/components/RadioPollsManagement";
 import RadioCommentsManagement from "@/components/RadioCommentsManagement";
 import AdminUsersManagement from "@/components/AdminUsersManagement";
+import AutoNewsManager from "@/components/AutoNewsManager";
 
 interface StatsData {
   candidatesCount: number;
@@ -278,7 +279,7 @@ const Admin = () => {
 
         {/* Main Content */}
         <Tabs defaultValue="admin-users" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-11">
+          <TabsList className="grid w-full grid-cols-12">
             <TabsTrigger value="admin-users">
               <Shield className="h-4 w-4 mr-1" />
               Admins
@@ -288,6 +289,7 @@ const Admin = () => {
             <TabsTrigger value="scholarships">Bolsas</TabsTrigger>
             <TabsTrigger value="contact">Contacto</TabsTrigger>
             <TabsTrigger value="news">Notícias</TabsTrigger>
+            <TabsTrigger value="auto-news">Busca Auto</TabsTrigger>
             <TabsTrigger value="radio-team">Equipa Rádio</TabsTrigger>
             <TabsTrigger value="radio-programs">Programação</TabsTrigger>
             <TabsTrigger value="radio-polls">Enquetes</TabsTrigger>
@@ -329,6 +331,10 @@ const Admin = () => {
                 <NewsAdmin />
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="auto-news">
+            <AutoNewsManager />
           </TabsContent>
 
           <TabsContent value="radio-team">
