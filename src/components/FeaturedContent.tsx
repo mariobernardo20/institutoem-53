@@ -109,11 +109,11 @@ export const FeaturedContent = () => {
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground mb-4 line-clamp-3">{item.content}</p>
-                  <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
-                    <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4" />
-                      <span>{formatRelativeTime(item.published_at)}</span>
-                    </div>
+                   <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
+                     <div className="flex items-center gap-2">
+                       <Calendar className="h-4 w-4" />
+                       <span>{formatRelativeTime(item.published_at || item.created_at)}</span>
+                     </div>
                     <div className="flex items-center gap-2">
                       <Clock className="h-4 w-4" />
                       <span>Leitura rápida</span>

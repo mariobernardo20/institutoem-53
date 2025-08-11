@@ -38,14 +38,11 @@ export const RadioTeamManagement = () => {
 
   const fetchMembers = async () => {
     try {
-      // Try to get from localStorage first for compatibility
+      // Try localStorage first, then default data
       const storedMembers = localStorage.getItem('radio_team_members');
       if (storedMembers) {
-        const localMembers = JSON.parse(storedMembers);
-        setMembers(localMembers);
-        // Migrate to localStorage since we don't have radio_team_members table yet
+        setMembers(JSON.parse(storedMembers));
       } else {
-        // Initialize with default team data
         const defaultMembers: RadioTeamMember[] = [
           {
             id: '1',
@@ -64,15 +61,6 @@ export const RadioTeamManagement = () => {
             schedule_time: '14:00-18:00',
             bio: 'Especialista em música portuguesa e internacional.',
             status: 'online'
-          },
-          {
-            id: '3',
-            name: 'Pedro Costa',
-            role: 'Locutor',
-            program: 'Noite Jovem',
-            schedule_time: '20:00-24:00',
-            bio: 'DJ e produtor musical, trazendo as novidades da música.',
-            status: 'recording'
           }
         ];
         setMembers(defaultMembers);
@@ -94,7 +82,9 @@ export const RadioTeamManagement = () => {
     try {
       const newMember: RadioTeamMember = {
         ...memberData,
-        id: Date.now().toString(), // Simple ID generation for localStorage
+        id: Date.now().toString(),
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
       };
 
       const updatedMembers = [...members, newMember];
@@ -107,6 +97,7 @@ export const RadioTeamManagement = () => {
         description: "Membro adicionado com sucesso",
       });
     } catch (error) {
+      console.error('Error adding member:', error);
       toast({
         title: "Erro",
         description: "Erro ao adicionar membro",
@@ -120,7 +111,9 @@ export const RadioTeamManagement = () => {
 
     try {
       const updatedMembers = members.map(member =>
-        member.id === editingMember.id ? { ...member, ...memberData } : member
+        member.id === editingMember.id 
+          ? { ...member, ...memberData, updated_at: new Date().toISOString() } 
+          : member
       );
       setMembers(updatedMembers);
       localStorage.setItem('radio_team_members', JSON.stringify(updatedMembers));
@@ -132,6 +125,7 @@ export const RadioTeamManagement = () => {
         description: "Membro atualizado com sucesso",
       });
     } catch (error) {
+      console.error('Error updating member:', error);
       toast({
         title: "Erro",
         description: "Erro ao atualizar membro",
@@ -151,6 +145,7 @@ export const RadioTeamManagement = () => {
         description: "Membro removido com sucesso",
       });
     } catch (error) {
+      console.error('Error deleting member:', error);
       toast({
         title: "Erro",
         description: "Erro ao remover membro",
@@ -161,7 +156,9 @@ export const RadioTeamManagement = () => {
 
   const updateMemberStatus = (memberId: string, newStatus: 'online' | 'offline' | 'recording') => {
     const updatedMembers = members.map(member =>
-      member.id === memberId ? { ...member, status: newStatus } : member
+      member.id === memberId 
+        ? { ...member, status: newStatus, updated_at: new Date().toISOString() } 
+        : member
     );
     setMembers(updatedMembers);
     localStorage.setItem('radio_team_members', JSON.stringify(updatedMembers));
@@ -275,10 +272,6 @@ export const RadioTeamManagement = () => {
               <MemberForm onSubmit={handleAddMember} />
             </DialogContent>
           </Dialog>
-        </div>
-        <div className="flex items-center gap-2 text-sm text-muted-foreground mt-2">
-          <AlertCircle className="h-4 w-4" />
-          <span>Sistema temporário - Dados salvos localmente. Em breve com banco de dados completo.</span>
         </div>
       </CardHeader>
       <CardContent>

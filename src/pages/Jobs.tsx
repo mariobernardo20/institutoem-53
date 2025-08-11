@@ -8,6 +8,7 @@ import { MapPin, Euro, Clock, Search, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import Header from "@/components/Header";
+import { JobApplicationDialog } from "@/components/JobApplicationDialog";
 interface Job {
   id: string;
   title: string;
@@ -20,14 +21,14 @@ interface Job {
   posted: string;
 }
 const Jobs = () => {
-  const {
-    t
-  } = useLanguage();
+  const { t } = useLanguage();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [locationFilter, setLocationFilter] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
+  const [selectedJob, setSelectedJob] = useState<Job | null>(null);
+  const [isApplicationDialogOpen, setIsApplicationDialogOpen] = useState(false);
   useEffect(() => {
     // Simulate real job data
     const mockJobs: Job[] = [{
@@ -193,7 +194,13 @@ const Jobs = () => {
                   </div>
                 </div>
 
-                <Button className="w-full md:w-auto">
+                <Button 
+                  className="w-full md:w-auto"
+                  onClick={() => {
+                    setSelectedJob(job);
+                    setIsApplicationDialogOpen(true);
+                  }}
+                >
                   {t('jobs.apply')}
                 </Button>
               </CardContent>
@@ -204,6 +211,16 @@ const Jobs = () => {
             <p className="text-muted-foreground">Nenhuma vaga encontrada com os filtros selecionados.</p>
           </div>}
       </div>
+
+      {selectedJob && (
+        <JobApplicationDialog
+          open={isApplicationDialogOpen}
+          onOpenChange={setIsApplicationDialogOpen}
+          jobId={selectedJob.id}
+          jobTitle={selectedJob.title}
+          companyName={selectedJob.company}
+        />
+      )}
     </div>;
 };
 export default Jobs;

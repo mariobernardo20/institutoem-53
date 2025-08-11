@@ -167,7 +167,11 @@ export const PortugalNews = () => {
             <div
               key={index}
               className="border-l-2 border-primary pl-4 hover:bg-gray-50 p-2 rounded transition-colors cursor-pointer"
-              onClick={() => article.url !== "#" && window.open(article.url, "_blank")}
+              onClick={() => {
+                if (article.url !== "#") {
+                  window.open(article.url, "_blank");
+                }
+              }}
             >
               <div className="flex items-start justify-between gap-2">
                 <div className="flex-1">
