@@ -18,27 +18,6 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
       onFilterChange(filter);
     }
   };
-
-  return (
-    <div className="bg-background border-b">
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex flex-wrap gap-2">
-          {filters.map((category) => (
-            <button
-              key={category}
-              onClick={() => handleFilterChange(category)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                activeFilter === category
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {category}
-            </button>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
+  return;
 };
 export default SearchFilters;
