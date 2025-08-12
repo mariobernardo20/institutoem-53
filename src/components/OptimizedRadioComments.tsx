@@ -43,10 +43,10 @@ const OptimizedRadioComments: React.FC<OptimizedRadioCommentsProps> = ({ program
   const fetchComments = useCallback(async () => {
     setLoading(true);
     try {
-      // Only fetch approved comments for better performance
+      // Only fetch approved comments (RLS policies now protect user emails)
       const { data: commentsData, error: commentsError } = await supabase
         .from('radio_comments')
-        .select('*')
+        .select('id, content, created_at, user_id, user_name, is_approved')
         .eq('is_approved', true)
         .order('created_at', { ascending: false })
         .limit(50); // Limit to latest 50 comments
@@ -149,7 +149,7 @@ const OptimizedRadioComments: React.FC<OptimizedRadioCommentsProps> = ({ program
           content: newComment.trim(),
           user_id: user.id,
           user_name: profile?.full_name || user.email || 'Usuário',
-          user_email: user.email,
+          // user_email removed for security
           is_approved: false // Comments need approval
         });
 

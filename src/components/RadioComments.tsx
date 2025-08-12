@@ -14,6 +14,8 @@ interface Comment {
   content: string;
   created_at: string;
   user_id: string;
+  user_name: string;
+  is_approved: boolean;
   profiles: {
     full_name: string;
     avatar_url?: string;
@@ -60,15 +62,12 @@ const RadioComments: React.FC<RadioCommentsProps> = ({ programId }) => {
   const fetchComments = async () => {
     setLoading(true);
     try {
-      // First get comments
-      let commentsQuery = supabase
+      // Only fetch approved comments (RLS policies now protect user emails)
+      const { data: commentsData, error: commentsError } = await supabase
         .from('radio_comments')
-        .select('id, content, created_at, user_id')
+        .select('id, content, created_at, user_id, user_name, is_approved')
+        .eq('is_approved', true)
         .order('created_at', { ascending: false });
-
-      // Removido filtro program_id já que não existe na tabela
-
-      const { data: commentsData, error: commentsError } = await commentsQuery;
 
       if (commentsError) {
         console.error('Error fetching comments:', commentsError);
@@ -80,7 +79,7 @@ const RadioComments: React.FC<RadioCommentsProps> = ({ programId }) => {
         return;
       }
 
-      // Then get profiles for each comment
+      // Get profiles for each comment user_id
       const commentsWithProfiles = await Promise.all(
         (commentsData || []).map(async (comment) => {
           const { data: profileData } = await supabase
@@ -91,7 +90,7 @@ const RadioComments: React.FC<RadioCommentsProps> = ({ programId }) => {
 
           return {
             ...comment,
-            profiles: profileData || { full_name: 'Usuário', avatar_url: null }
+            profiles: profileData || { full_name: comment.user_name || 'Usuário', avatar_url: null }
           };
         })
       );
@@ -132,8 +131,8 @@ const RadioComments: React.FC<RadioCommentsProps> = ({ programId }) => {
         .insert({
           content: newComment.trim(),
           user_id: user.id,
-          user_name: profile?.full_name || 'Usuário',
-          user_email: user.email
+          user_name: profile?.full_name || 'Usuário'
+          // user_email removed for security
         });
 
       if (error) {
