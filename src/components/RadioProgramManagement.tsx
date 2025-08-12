@@ -75,14 +75,15 @@ export const RadioProgramManagement = () => {
     
     try {
       if (editingProgram) {
-        const updateData = {
-          title: formData.name,
-          host_name: formData.host,
-          description: formData.description,
-          schedule_time: formData.start_time,
-          duration_minutes: calculateDuration(formData.start_time, formData.end_time),
-          is_active: true
-        };
+      const updateData = {
+        title: formData.name,
+        host_name: formData.host,
+        description: formData.description,
+        schedule_time: formData.start_time,
+        duration_minutes: calculateDuration(formData.start_time, formData.end_time),
+        day_of_week: formData.day_of_week,
+        is_active: true
+      };
         await updateProgram(editingProgram.id!, updateData);
       } else {
         const programData = {
@@ -117,6 +118,14 @@ export const RadioProgramManagement = () => {
   const handleDelete = async (id: string) => {
     try {
       await deleteProgram(id);
+    } catch (error) {
+      // Error handled in hook
+    }
+  };
+
+  const handleToggleActive = async (program: RadioProgram) => {
+    try {
+      await updateProgram(program.id!, { is_active: !program.is_active });
     } catch (error) {
       // Error handled in hook
     }
@@ -253,9 +262,27 @@ export const RadioProgramManagement = () => {
             </CardHeader>
             <CardContent>
               {day.programs.length === 0 ? (
-                <p className="text-muted-foreground text-center py-4">
-                  Nenhum programa agendado para este dia
-                </p>
+                <div className="text-center py-6">
+                  <p className="text-muted-foreground mb-4">
+                    Nenhum programa agendado para este dia
+                  </p>
+                  {day.value !== 0 && (
+                    <div className="flex justify-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setFormData({ ...formData, day_of_week: day.value });
+                          setIsFormOpen(true);
+                        }}
+                        className="gap-1"
+                      >
+                        <Plus className="h-3 w-3" />
+                        Adicionar Programa
+                      </Button>
+                    </div>
+                  )}
+                </div>
               ) : (
                 <div className="space-y-3">
                   {day.programs.map((program) => (
@@ -269,6 +296,9 @@ export const RadioProgramManagement = () => {
                           <span className="text-sm text-muted-foreground">
                             {program.start_time} - {program.end_time}
                           </span>
+                          <Badge variant={program.is_active ? "default" : "secondary"}>
+                            {program.is_active ? "Publicado" : "Rascunho"}
+                          </Badge>
                         </div>
                         <p className="text-sm text-muted-foreground mb-1">
                           Apresentador: {program.host}
@@ -286,6 +316,14 @@ export const RadioProgramManagement = () => {
                         >
                           <Edit className="h-3 w-3" />
                           Editar
+                        </Button>
+                        <Button
+                          variant={program.is_active ? "secondary" : "default"}
+                          size="sm"
+                          onClick={() => handleToggleActive(program)}
+                          className="gap-1"
+                        >
+                          {program.is_active ? "Despublicar" : "Publicar"}
                         </Button>
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
@@ -316,6 +354,22 @@ export const RadioProgramManagement = () => {
                       </div>
                     </div>
                   ))}
+                  {day.value !== 0 && (
+                    <div className="flex justify-center pt-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setFormData({ ...formData, day_of_week: day.value });
+                          setIsFormOpen(true);
+                        }}
+                        className="gap-1"
+                      >
+                        <Plus className="h-3 w-3" />
+                        Adicionar Programa
+                      </Button>
+                    </div>
+                  )}
                 </div>
               )}
             </CardContent>

@@ -8,6 +8,15 @@ import { Tables } from "@/integrations/supabase/types";
 
 type DbRadioProgram = Tables<"radio_programs">;
 
+// Helper function to format end time based on start time and duration
+const formatEndTime = (startTime: string, durationMinutes: number): string => {
+  const [hours, minutes] = startTime.split(':').map(Number);
+  const totalMinutes = hours * 60 + minutes + durationMinutes;
+  const endHours = Math.floor(totalMinutes / 60) % 24;
+  const endMinutes = totalMinutes % 60;
+  return `${endHours.toString().padStart(2, '0')}:${endMinutes.toString().padStart(2, '0')}`;
+};
+
 export const useRadioPrograms = () => {
   const [programs, setPrograms] = useState<RadioProgram[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -19,18 +28,18 @@ export const useRadioPrograms = () => {
       const { data, error } = await supabase
         .from('radio_programs')
         .select('*')
-        .eq('is_active', true)
         .order('schedule_time', { ascending: true });
 
       if (error) throw error;
 
-      const programsData = (data || []).map((program: DbRadioProgram): RadioProgram => ({
+      const programsData = (data || []).map((program: any): RadioProgram => ({
         ...program,
         name: program.title,
         host: program.host_name || 'Host não especificado',
-        day_of_week: 0, // Default value
+        day_of_week: program.day_of_week || 0,
         start_time: program.schedule_time || '00:00',
-        end_time: '23:59' // Default end time
+        end_time: program.schedule_time && program.duration_minutes ? 
+          formatEndTime(program.schedule_time, program.duration_minutes) : '23:59'
       }));
       setPrograms(programsData);
     } catch (error) {
@@ -52,7 +61,8 @@ export const useRadioPrograms = () => {
         host_name: program.host,
         description: program.description,
         schedule_time: program.start_time,
-        duration_minutes: 60,
+        duration_minutes: program.duration_minutes || 60,
+        day_of_week: program.day_of_week,
         is_active: true
       };
       
@@ -68,9 +78,10 @@ export const useRadioPrograms = () => {
         ...data,
         name: data.title,
         host: data.host_name || 'Host não especificado',
-        day_of_week: 0,
+        day_of_week: (data as any).day_of_week || 0,
         start_time: data.schedule_time || '00:00',
-        end_time: '23:59'
+        end_time: data.schedule_time && data.duration_minutes ? 
+          formatEndTime(data.schedule_time, data.duration_minutes) : '23:59'
       };
       setPrograms(prev => [...prev, newProgram]);
       toast({
@@ -105,9 +116,10 @@ export const useRadioPrograms = () => {
         ...data,
         name: data.title,
         host: data.host_name || 'Host não especificado',
-        day_of_week: 0,
+        day_of_week: (data as any).day_of_week || 0,
         start_time: data.schedule_time || '00:00',
-        end_time: '23:59'
+        end_time: data.schedule_time && data.duration_minutes ? 
+          formatEndTime(data.schedule_time, data.duration_minutes) : '23:59'
       };
       setPrograms(prev => prev.map(p => p.id === id ? updatedProgram : p));
       toast({
